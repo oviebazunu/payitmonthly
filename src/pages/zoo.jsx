@@ -1,18 +1,18 @@
 import React, { useState } from "react";
 
-// Helper function to generate a random number within a range
+//Random number generator
 const getRandom = (min, max) => Math.random() * (max - min) + min;
 
 const Animal = ({ type, health, status }) => {
-  let textColor = "text-green-500"; // Default color for "Alive"
+  let textColor = "text-green-500"; //if alive
   if (status === "Dead") {
     textColor = "text-red-500";
   } else if (status === "Cannot Walk") {
-    textColor = "bright-yellow"; // Example, adjust as needed
+    textColor = "text-yellow-500";
   }
 
   return (
-    <div className="p-4 border border-gray-200 rounded-lg shadow-lg">
+    <div className="p-4 border border-gray-200 rounded-lg shadow-lg transition-transform duration-200 hover:scale-105">
       <h2 className="text-xl font-bold">{type}</h2>
       <p>Health: {health.toFixed(2)}%</p>
       <p>
@@ -53,15 +53,14 @@ const Zoo = () => {
       0,
       animal.health - (getRandom(0, 20) * animal.health) / 100
     );
-    let newStatus = animal.status; // Assume status stays the same unless conditions below trigger a change
+    let newStatus = animal.status;
 
-    // Adjust health and status for monkeys and giraffes
     if (
       (type === "Monkey" && newHealth < 30) ||
       (type === "Giraffe" && newHealth < 50)
     ) {
-      newHealth = 0; // Set health to 0 if below threshold
-      newStatus = "Dead"; // Update status to dead
+      newHealth = 0; // sets health to zero if below required with status updated
+      newStatus = "Dead";
     } else if (type === "Elephant") {
       let hoursBelowThreshold = animal.hoursBelowThreshold;
 
@@ -70,8 +69,8 @@ const Zoo = () => {
         if (hoursBelowThreshold === 1) {
           newStatus = "Cannot Walk";
         } else if (hoursBelowThreshold > 1) {
-          newStatus = "Dead";
-          newHealth = 0; // Elephants also get their health set to 0 if dead
+          newStatus = "Dead"; // sets health to zero if below required with status updated
+          newHealth = 0;
         }
       } else {
         hoursBelowThreshold = 0; // Reset if health is above 70
@@ -90,7 +89,7 @@ const Zoo = () => {
     return {
       ...animal,
       health: newHealth,
-      status: newStatus, // Make sure to update the status in the return object
+      status: newStatus,
     };
   };
 
@@ -115,8 +114,12 @@ const Zoo = () => {
   //feeds the animal uses a condition check where if isAlive is true adds health between 10-25 if isAlive is false keeps health value the same.
 
   const feedAnimals = () => {
-    const feed = (type) => (animal) => {
-      // Determine if the animal can be fed. Elephants can be fed even if "Cannot Walk".
+    const monkeyFeedNumber = getRandom(10, 25);
+    const giraffeFeedNumber = getRandom(10, 25);
+    const elephantFeedNumber = getRandom(10, 25);
+
+    const feed = (type, feedNumber) => (animal) => {
+      //Checks if animal can be fed including elephant cant walk
       let canBeFed =
         isAliveCheck(type, animal.health) ||
         (type === "Elephant" && animal.status === "Cannot Walk");
@@ -125,50 +128,50 @@ const Zoo = () => {
         return animal; // If it cannot be fed, return the animal unchanged.
       }
 
-      // Calculate new health, ensuring it does not exceed 100%.
+      // Calculate new health max value 100
       const newHealth = Math.min(
         100,
-        animal.health + (getRandom(10, 25) * animal.health) / 100
+        animal.health + (feedNumber * animal.health) / 100
       );
 
-      // For elephants, check if the new health is above the threshold to change status back to "Alive".
-      let newStatus = animal.status; // Default to current status
+      // Checks if elephant health is above 70. If so status changes to Alive
+      let newStatus = animal.status;
       if (type === "Elephant" && newHealth > 70) {
-        newStatus = "Alive"; // Change status to "Alive" if health goes above 70%
+        newStatus = "Alive";
       }
 
       // Return the updated animal object with new health and possibly updated status.
       return {
         ...animal,
         health: newHealth,
-        status: newStatus, // This will be updated for elephants as necessary
+        status: newStatus,
       };
     };
 
     setAnimals({
-      monkeys: animals.monkeys.map(feed("Monkey")),
-      giraffes: animals.giraffes.map(feed("Giraffe")),
-      elephants: animals.elephants.map(feed("Elephant")),
+      monkeys: animals.monkeys.map(feed("Monkey", monkeyFeedNumber)),
+      giraffes: animals.giraffes.map(feed("Giraffe", giraffeFeedNumber)),
+      elephants: animals.elephants.map(feed("Elephant", elephantFeedNumber)),
     });
   };
 
   return (
     <div className="max-w-4xl mx-auto my-8 p-4">
-      <div className="bg-white mx-40 rounded-[12px]">
-        <h1 className="text-3xl font-bold text-center underline mb-6 py-6">
+      <div className="bg-white mx-4 sm:mx-10 md:mx-20 lg:mx-40 rounded-[12px]">
+        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center underline mb-6 py-6">
           Zoo Simulator
         </h1>
       </div>
       <div className="bg-white p-10 rounded-[12px] pt-10 ">
         <div className="flex justify-around mb-4">
           <button
-            className="bg-blue-700 hover:bg-[#0E16AF] text-white font-bold py-3 px-4 rounded-[12px] shadow-lg"
+            className="bg-blue-700 hover:bg-[#0E16AF] text-white font-bold py-3 px-4 rounded-[12px] shadow-lg transition-transform duration-200 hover:scale-105"
             onClick={passTime}
           >
             Pass One Hour
           </button>
           <button
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-[12px]"
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-[12px] shadow-lg transition-transform duration-200 hover:scale-105"
             onClick={feedAnimals}
           >
             Feed Animals
