@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 
 //Random number generator
+//Min is used to for newhealth check
 const getRandom = (min, max) => Math.random() * (max - min) + min;
 
 const Animal = ({ type, health, status }) => {
@@ -59,7 +60,7 @@ const Zoo = () => {
       (type === "Monkey" && newHealth < 30) ||
       (type === "Giraffe" && newHealth < 50)
     ) {
-      newHealth = 0; // sets health to zero if below required with status updated
+      // Sets health to zero if below required with status updated
       newStatus = "Dead";
     } else if (type === "Elephant") {
       let hoursBelowThreshold = animal.hoursBelowThreshold;
@@ -69,8 +70,7 @@ const Zoo = () => {
         if (hoursBelowThreshold === 1) {
           newStatus = "Cannot Walk";
         } else if (hoursBelowThreshold > 1) {
-          newStatus = "Dead"; // sets health to zero if below required with status updated
-          newHealth = 0;
+          newStatus = "Dead";
         }
       } else {
         hoursBelowThreshold = 0; // Reset if health is above 70
@@ -94,7 +94,10 @@ const Zoo = () => {
   };
 
   const passTime = () => {
-    setTime(time + 1);
+    setTime((prevTime) => {
+      const nextTime = (prevTime + 1) % 24;
+      return nextTime;
+    });
     setAnimals({
       monkeys: animals.monkeys.map((animal) => updateHealth(animal, "Monkey")),
       giraffes: animals.giraffes.map((animal) =>
@@ -111,7 +114,7 @@ const Zoo = () => {
     return health >= minimumHealthRequired[type];
   };
 
-  //feeds the animal uses a condition check where if isAlive is true adds health between 10-25 if isAlive is false keeps health value the same.
+  //Feeds the animal uses a condition check where if isAlive is true adds health between 10-25 if isAlive is false keeps health value the same.
 
   const feedAnimals = () => {
     const monkeyFeedNumber = getRandom(10, 25);
@@ -156,7 +159,7 @@ const Zoo = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto my-8 p-4">
+    <main className=" max-w-4xl mx-auto my-8 p-4 ">
       <div className="bg-white mx-4 sm:mx-10 md:mx-20 lg:mx-40 rounded-[12px]">
         <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center underline mb-6 py-6">
           Zoo Simulator
@@ -177,7 +180,10 @@ const Zoo = () => {
             Feed Animals
           </button>
         </div>
-        <h2 className="text-2xl font-semibold mb-4">Time: {time} hours</h2>
+        <h2 className="text-2xl font-semibold mb-4">
+          Time: {`${time.toString().padStart(2, "0")}:00`}
+        </h2>
+
         {Object.entries(animals).map(([type, animalArray], index) => (
           <div key={index}>
             <h2 className="text-xl font-bold capitalize mb-2 underline underline-offset-2 decoration-2">
@@ -196,7 +202,7 @@ const Zoo = () => {
           </div>
         ))}
       </div>
-    </div>
+    </main>
   );
 };
 
