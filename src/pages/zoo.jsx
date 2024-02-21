@@ -13,7 +13,7 @@ const Animal = ({ type, health, status }) => {
   }
 
   return (
-    <div className="p-4 border border-gray-200 rounded-lg shadow-lg transition-transform duration-200 hover:scale-105">
+    <div className="p-4 border-2 border-[#c5b4e3] rounded-lg shadow-lg transition-transform duration-200 hover:scale-105">
       <h2 className="text-xl font-bold">{type}</h2>
       <p>Health: {health.toFixed(2)}%</p>
       <p>
